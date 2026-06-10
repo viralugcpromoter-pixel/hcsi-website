@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>High Converting Static Images — Ad Creatives & Designs</title>
+  <meta name="description" content="High Converting Static Images (HCSI): scroll-stopping ad creatives, banners, flyers, posters, FB covers & menu boards for any niche. Starting at ₱499." />
+  <meta property="og:title" content="High Converting Static Images" />
+  <meta property="og:description" content="Scroll-stopping ad creatives & designs for your business. Starting at ₱499." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>" />
+  <style>html,body{margin:0;padding:0}#root{min-height:100vh}</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
+const FB_URL = "https://www.facebook.com/HighConvertingStaticimages";
+
+/* ─── BRAND COLORS (from logo) ──────────────────────────────────────────── */
+// Navy blue: #1B3A8C  Red accent: #E8192C  Purple-pink gradient on icon
+// Background: white / very light lavender
+
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@700;800;900&display=swap');
+
+:root {
+  --navy:   #1B3A8C;
+  --red:    #E8192C;
+  --purple: #7B3FF5;
+  --pink:   #D946EF;
+  --grad-icon: linear-gradient(135deg, #7B3FF5, #D946EF);
+  --grad-btn:  linear-gradient(135deg, #1B3A8C, #3B5EC6);
+  --light-bg:  #F0F2FF;
+  --gray:      #F7F8FC;
+  --border:    #E4E8F4;
+  --body:      #1A2235;
+  --muted:     #64748B;
+  --white:     #ffffff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--white); color: var(--body); overflow-x: hidden; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ── LOGO SVG inline ── */
+.brand-logo {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+}
+.brand-logo-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--grad-icon);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.brand-logo-text { line-height: 1.1; }
+.brand-logo-text .t1 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: .82rem; color: var(--navy); display: block; }
+.brand-logo-text .t2 { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: .72rem; color: var(--muted); display: block; }
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; height: 60px; transition: all .3s;
+}
+.nav.scrolled {
+  background: rgba(255,255,255,.97); backdrop-filter: blur(16px);
+  box-shadow: 0 1px 0 var(--border), 0 4px 20px rgba(27,58,140,.07);
+}
+.nav-links { display: none; gap: 1.5rem; align-items: center; }
+.nav-links a { font-size: .82rem; font-weight: 600; color: var(--body); transition: color .2s; cursor: pointer; }
+.nav-links a:hover, .nav-links a.active { color: var(--navy); }
+.nav-cta-btn {
+  background: var(--grad-btn); color: #fff !important;
+  padding: 8px 18px; border-radius: 100px; font-size: .8rem !important; font-weight: 700 !important;
+}
+.hb { display: flex; flex-direction: column; gap: 5px; background: none; border: none; padding: 4px; }
+.hb span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; transition: all .3s; }
+.hb.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+.hb.open span:nth-child(2) { opacity: 0; }
+.hb.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+.drawer {
+  position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+  background: #fff; z-index: 999; padding: 1.5rem 24px;
+  display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.drawer.open { transform: translateX(0); }
+.drawer a { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; font-weight: 700; font-size: 1rem; border-bottom: 1px solid var(--border); cursor: pointer; color: var(--body); }
+.drawer-cta { margin-top: auto; background: var(--grad-btn); color: #fff !important; padding: 16px !important; border-radius: 14px; text-align: center; justify-content: center !important; border-bottom: none !important; }
+
+/* ── FLOAT ── */
+.float-fb {
+  position: fixed; bottom: 20px; right: 20px; z-index: 900;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--grad-btn); display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(27,58,140,.38); transition: transform .2s, box-shadow .2s;
+}
+.float-fb:hover { transform: scale(1.1); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 80px 24px 52px; position: relative; overflow: hidden;
+  background: linear-gradient(160deg, #EEF0FF 0%, #F8F0FF 50%, #FFF0F8 100%);
+}
+.hero-orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(60px); }
+.hero-logo-big {
+  display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 2rem;
+  position: relative; z-index: 2;
+}
+.hero-logo-icon {
+  width: 72px; height: 72px; border-radius: 18px; background: var(--grad-icon);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 14px;
+  box-shadow: 0 8px 32px rgba(123,63,245,.28);
+}
+.hero h1 {
+  font-family: 'Nunito', sans-serif; font-weight: 900;
+  font-size: clamp(2rem, 7vw, 3.6rem); color: var(--navy); line-height: 1.1;
+  margin-bottom: 1rem; position: relative; z-index: 2;
+}
+.hero h1 span { color: var(--red); }
+.hero p {
+  font-size: clamp(.9rem, 2.5vw, 1rem); color: var(--muted); line-height: 1.8;
+  margin-bottom: 2rem; max-width: 500px; position: relative; z-index: 2;
+}
+.hero-btns { display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 2; }
+.btn-navy {
+  background: var(--grad-btn); color: #fff; font-weight: 800; padding: 15px 24px;
+  border-radius: 12px; border: none; font-size: .92rem; font-family: inherit;
+  transition: transform .2s, box-shadow .2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+}
+.btn-navy:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(27,58,140,.3); }
+.btn-outline {
+  background: transparent; color: var(--navy); font-weight: 700; padding: 15px 24px;
+  border-radius: 12px; border: 2px solid var(--navy); font-size: .92rem; font-family: inherit;
+  transition: background .2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  text-decoration: none;
+}
+.btn-outline:hover { background: rgba(27,58,140,.06); }
+
+/* ── TRUST STRIP ── */
+.trust { background: var(--navy); padding: 22px 24px; }
+.trust-inner { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; max-width: 900px; margin: 0 auto; }
+.trust-item { display: flex; align-items: center; gap: 10px; }
+.trust-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+.trust-num { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.1rem; color: #fff; line-height: 1; }
+.trust-lbl { font-size: .7rem; color: rgba(255,255,255,.6); font-weight: 500; }
+
+/* ── SECTIONS ── */
+.sec { padding: 60px 24px; }
+.sec-light { background: var(--light-bg); }
+.sec-gray  { background: var(--gray); }
+.slbl { font-size: .7rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--purple); margin-bottom: 8px; }
+.stitle { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: clamp(1.6rem,5vw,2.5rem); color: var(--navy); line-height: 1.15; }
+.ssub { color: var(--muted); font-size: .88rem; line-height: 1.75; margin-top: 8px; max-width: 520px; }
+.shdr { margin-bottom: 2rem; }
+.shdr.c { text-align: center; }
+.shdr.c .ssub { margin-left: auto; margin-right: auto; }
+
+/* ══════════════════════════
+   SERVICE CARDS — CLICK TO EXPAND
+══════════════════════════ */
+.svc-main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.svc-main-card {
+  border: 2px solid var(--border); border-radius: 18px; padding: 20px 16px;
+  background: #fff; cursor: pointer; transition: all .25s; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.svc-main-card:hover { border-color: var(--navy); box-shadow: 0 4px 20px rgba(27,58,140,.1); transform: translateY(-2px); }
+.svc-main-card.active { border-color: var(--navy); background: var(--light-bg); box-shadow: 0 4px 24px rgba(27,58,140,.12); }
+.svc-main-icon { font-size: 2.2rem; }
+.svc-main-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: .92rem; color: var(--navy); line-height: 1.3; }
+.svc-main-sub { font-size: .72rem; color: var(--muted); line-height: 1.4; }
+.svc-main-from { background: var(--red); color: #fff; font-size: .65rem; font-weight: 800; padding: 2px 10px; border-radius: 100px; }
+.svc-main-card.active .svc-main-from { background: var(--navy); }
+
+/* EXPANDED PANEL */
+.svc-expand {
+  border: 2px solid var(--navy); border-radius: 18px; background: #fff;
+  margin-top: 4px; overflow: hidden;
+  animation: slideDown .3s ease;
+}
+@keyframes slideDown { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform: translateY(0); } }
+.svc-expand-header {
+  background: var(--navy); padding: 16px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.svc-expand-title { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1rem; color: #fff; }
+.svc-expand-close { background: rgba(255,255,255,.15); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; font-size: 1rem; line-height: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* AD CREATIVE PACKAGES inside expand */
+.pkg-grid { display: flex; gap: 10px; overflow-x: auto; padding: 18px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.pkg-grid::-webkit-scrollbar { display: none; }
+.pkg-mini {
+  flex-shrink: 0; min-width: 165px; border: 2px solid var(--border); border-radius: 14px;
+  padding: 16px 14px; background: #fff; position: relative; display: flex; flex-direction: column;
+  transition: border-color .2s;
+}
+.pkg-mini.featured { border-color: var(--navy); }
+.pkg-mini-badge {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: var(--red); color: #fff; font-size: .62rem; font-weight: 800; padding: 3px 12px; border-radius: 100px; white-space: nowrap;
+}
+.pkg-mini-name { font-size: .68rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+.pkg-mini-price { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.7rem; color: var(--navy); line-height: 1; margin-bottom: 3px; }
+.pkg-mini-tag { font-size: .7rem; color: var(--purple); font-weight: 700; margin-bottom: 10px; }
+.pkg-mini-div { height: 1px; background: var(--border); margin-bottom: 10px; }
+.pkg-mini-feat { font-size: .75rem; color: var(--body); padding: 4px 0; border-bottom: 1px solid #F1F3F8; display: flex; align-items: flex-start; gap: 6px; }
+.pkg-mini-feat:last-child { border-bottom: none; }
+.pchk { color: var(--navy); font-weight: 900; font-size: .78rem; flex-shrink: 0; margin-top: 1px; }
+.pkg-mini-cta { margin-top: 12px; width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: 800; font-size: .78rem; background: var(--grad-btn); color: #fff; text-align: center; display: block; text-decoration: none; transition: opacity .2s; }
+.pkg-mini-cta:hover { opacity: .88; }
+
+/* OTHER SERVICE tier card inside expand */
+.ods-inner { padding: 18px; }
+.ods-desc-text { font-size: .84rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+.tier-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+.tier-card { border: 2px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; transition: all .2s; }
+.tier-card.best { border-color: var(--navy); background: var(--light-bg); }
+.tier-lbl { font-size: .62rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; display: inline-block; padding: 2px 10px; border-radius: 100px; }
+.tier-price { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.35rem; color: var(--navy); line-height: 1; margin-bottom: 5px; }
+.tier-inc { font-size: .7rem; color: var(--muted); line-height: 1.4; }
+.tier-na { font-size: .7rem; color: #CBD5E1; font-style: italic; }
+.ods-cta-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ods-cta-note { font-size: .75rem; color: var(--muted); flex: 1; min-width: 120px; }
+
+/* CATEGORY FILTER PORTFOLIO */
+.cat-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 1.2rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cat-pill { flex-shrink: 0; padding: 7px 15px; border-radius: 100px; border: 1.5px solid var(--border); background: #fff; font-size: .78rem; font-weight: 700; color: var(--body); cursor: pointer; transition: all .2s; white-space: nowrap; }
+.cat-pill.active, .cat-pill:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+/* PORTFOLIO GRID */
+.pgrid { columns: 2; column-gap: 10px; }
+.pitem { break-inside: avoid; margin-bottom: 10px; border-radius: 14px; overflow: hidden; cursor: pointer; position: relative; display: block; }
+.pover { position: absolute; inset: 0; background: linear-gradient(to top, rgba(27,58,140,.88) 0%, transparent 55%); padding: 10px; display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; transition: opacity .25s; }
+.pitem:hover .pover, .pitem:active .pover { opacity: 1; }
+.from-tag { position: absolute; top: 8px; right: 8px; background: var(--red); color: #fff; font-size: .6rem; font-weight: 800; padding: 3px 9px; border-radius: 100px; }
+
+/* TESTIMONIALS */
+.tscroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.tscroll::-webkit-scrollbar { display: none; }
+.tcard { flex-shrink: 0; width: 270px; background: #fff; border-radius: 16px; padding: 18px; border: 1.5px solid var(--border); }
+.tstars { color: var(--red); font-size: .85rem; margin-bottom: 8px; }
+.ttext { font-size: .84rem; color: var(--body); line-height: 1.7; margin-bottom: 12px; font-style: italic; }
+.tauthor { display: flex; align-items: center; gap: 10px; }
+.tavatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; background: var(--grad-btn); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: .85rem; }
+.tname { font-weight: 700; font-size: .78rem; color: var(--navy); }
+.tbiz { font-size: .68rem; color: var(--muted); }
+
+/* FAQ */
+.faq-item { border-bottom: 1.5px solid var(--border); }
+.faq-q { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 15px 0; background: none; border: none; font-size: .86rem; font-weight: 700; color: var(--navy); text-align: left; gap: 12px; font-family: inherit; }
+.faq-icon { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--light-bg); display: flex; align-items: center; justify-content: center; color: var(--navy); font-weight: 900; transition: transform .3s; font-size: .85rem; }
+.faq-icon.open { transform: rotate(45deg); }
+.faq-a { padding: 0 0 14px; font-size: .82rem; color: var(--muted); line-height: 1.75; }
+
+/* CTA BANNER */
+.cta-ban { background: var(--navy); padding: 56px 24px; text-align: center; }
+.cta-ban h2 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: clamp(1.5rem,6vw,2.4rem); color: #fff; line-height: 1.2; margin-bottom: 10px; }
+.cta-ban p { color: rgba(255,255,255,.65); font-size: .9rem; margin-bottom: 22px; }
+.btn-red { background: var(--red); color: #fff; font-weight: 800; padding: 15px 28px; border-radius: 12px; border: none; font-size: .95rem; font-family: inherit; transition: transform .2s, box-shadow .2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn-red:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,25,44,.4); }
+
+/* FOOTER */
+.footer { background: #0D1E4A; color: rgba(255,255,255,.5); padding: 44px 24px 28px; }
+.footer-logo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.footer-logo-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--grad-icon); display: flex; align-items: center; justify-content: center; }
+.footer-logo-name { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: .9rem; color: #fff; }
+.footer-desc { font-size: .78rem; line-height: 1.7; margin-bottom: 22px; }
+.footer-links { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 22px; }
+.fl-link { font-size: .78rem; color: rgba(255,255,255,.45); cursor: pointer; transition: color .2s; padding: 3px 0; }
+.fl-link:hover { color: var(--red); }
+.footer-bot { border-top: 1px solid rgba(255,255,255,.08); padding-top: 16px; font-size: .7rem; text-align: center; }
+
+/* CONTACT */
+.fg { margin-bottom: 14px; }
+.fl { display: block; font-size: .78rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+.fi { width: 100%; padding: 12px 14px; border-radius: 11px; border: 1.5px solid var(--border); font-size: .86rem; font-family: inherit; background: #fff; color: var(--body); outline: none; transition: border-color .2s; }
+.fi:focus { border-color: var(--navy); }
+textarea.fi { resize: vertical; min-height: 100px; }
+
+/* PRICE TABLE */
+.ptable { width: 100%; border-collapse: collapse; font-size: .78rem; min-width: 440px; }
+.ptable th { background: var(--navy); color: #fff; padding: 11px 12px; text-align: left; font-weight: 800; font-size: .72rem; letter-spacing: .04em; }
+.ptable td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--body); }
+.ptable tr:nth-child(even) td { background: var(--gray); }
+.ptable .na { color: #CBD5E1; font-style: italic; }
+
+/* DESKTOP */
+@media(min-width: 768px) {
+  .nav { padding: 0 5%; height: 68px; }
+  .hb { display: none; }
+  .nav-links { display: flex; }
+  .drawer { display: none !important; }
+  .hero { padding: 100px 5% 80px; }
+  .hero-btns { flex-direction: row; }
+  .sec { padding: 84px 5%; }
+  .trust-inner { grid-template-columns: repeat(5,1fr); }
+  .svc-main-grid { grid-template-columns: repeat(4,1fr); }
+  .pgrid { columns: 3; }
+  .tier-grid { gap: 14px; }
+}
+@media(min-width: 1024px) { .pgrid { columns: 4; } }
+
+/* ANIM */
+@keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+.anim { opacity: 0; animation: fadeUp .5s ease forwards; }
+.a1{animation-delay:.08s}.a2{animation-delay:.18s}.a3{animation-delay:.28s}.a4{animation-delay:.38s}
+.pe { animation: fadeUp .35s ease forwards; }
+`;
+
+/* ─── LOGO SVG ─────────────────────────────────────────────────────────────── */
+function LogoIcon({
+  size = 34
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    width: size,
+    height: size,
+    viewBox: "0 0 100 100",
+    xmlns: "http://www.w3.org/2000/svg"
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "lg1",
+    x1: "0%",
+    y1: "0%",
+    x2: "100%",
+    y2: "100%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#7B3FF5"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#D946EF"
+  }))), /*#__PURE__*/React.createElement("rect", {
+    width: "100",
+    height: "100",
+    rx: "22",
+    fill: "url(#lg1)"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M12 76 L38 40 L54 58 L68 44 L88 76 Z",
+    fill: "#1B3A8C",
+    opacity: "0.9"
+  }), /*#__PURE__*/React.createElement("polyline", {
+    points: "14,72 30,50 46,60 62,38 78,28",
+    fill: "none",
+    stroke: "#E8192C",
+    strokeWidth: "6",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }), /*#__PURE__*/React.createElement("polygon", {
+    points: "78,28 68,24 72,36",
+    fill: "#E8192C"
+  }));
+}
+
+/* ─── PLACEHOLDER IMAGE ────────────────────────────────────────────────────── */
+function PlaceholderImg({
+  label,
+  type,
+  idx,
+  h = 280
+}) {
+  const pals = [["#1B3A8C", "#3B5EC6"], ["#7B3FF5", "#D946EF"], ["#1B3A8C", "#7B3FF5"], ["#0D47A1", "#1565C0"], ["#1a237e", "#3949AB"], ["#4A148C", "#7B1FA2"], ["#B71C1C", "#1B3A8C"], ["#1B3A8C", "#0097A7"], ["#2E7D32", "#1B3A8C"], ["#E65100", "#1B3A8C"], ["#1B3A8C", "#880E4F"], ["#006064", "#1B3A8C"]];
+  const emojis = ["🍽️", "🦷", "💄", "🏠", "💪", "✈️", "💍", "🏗️", "📚", "🛒", "🏢", "🎨"];
+  const [c1, c2] = pals[idx % pals.length];
+  return /*#__PURE__*/React.createElement("svg", {
+    viewBox: `0 0 300 ${h}`,
+    xmlns: "http://www.w3.org/2000/svg",
+    style: {
+      width: "100%",
+      height: "100%",
+      display: "block"
+    }
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: `g${idx}`,
+    x1: "0%",
+    y1: "0%",
+    x2: "100%",
+    y2: "100%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: c1
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: c2
+  })), /*#__PURE__*/React.createElement("linearGradient", {
+    id: `gd${idx}`,
+    x1: "0%",
+    y1: "50%",
+    x2: "0%",
+    y2: "100%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "transparent"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "rgba(0,0,0,.82)"
+  }))), /*#__PURE__*/React.createElement("rect", {
+    width: "300",
+    height: h,
+    fill: `url(#g${idx})`
+  }), /*#__PURE__*/React.createElement("rect", {
+    width: "300",
+    height: h,
+    fill: `url(#gd${idx})`
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "150",
+    cy: h * 0.37,
+    r: "40",
+    fill: "rgba(255,255,255,.1)"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "150",
+    y: h * 0.37 + 14,
+    textAnchor: "middle",
+    fontSize: "32"
+  }, emojis[idx % emojis.length]), /*#__PURE__*/React.createElement("text", {
+    x: "150",
+    y: h - 38,
+    textAnchor: "middle",
+    fill: "rgba(255,255,255,.5)",
+    fontSize: "9",
+    fontFamily: "sans-serif",
+    fontWeight: "700",
+    letterSpacing: "2"
+  }, type?.toUpperCase()), /*#__PURE__*/React.createElement("text", {
+    x: "150",
+    y: h - 18,
+    textAnchor: "middle",
+    fill: "#ffffff",
+    fontSize: "12",
+    fontFamily: "sans-serif",
+    fontWeight: "700"
+  }, label));
+}
+
+/* ─── DATA ─────────────────────────────────────────────────────────────────── */
+const CATEGORIES = [{
+  id: "all",
+  label: "All"
+}, {
+  id: "restaurant",
+  label: "🍽️ Restaurant"
+}, {
+  id: "dental",
+  label: "🦷 Dental"
+}, {
+  id: "beauty",
+  label: "💄 Beauty"
+}, {
+  id: "realestate",
+  label: "🏠 Real Estate"
+}, {
+  id: "gym",
+  label: "💪 Gym"
+}, {
+  id: "travel",
+  label: "✈️ Travel"
+}, {
+  id: "jewelry",
+  label: "💍 Jewelry"
+}, {
+  id: "construction",
+  label: "🏗️ Construction"
+}, {
+  id: "coaching",
+  label: "📚 Coaching"
+}, {
+  id: "ecommerce",
+  label: "🛒 Ecommerce"
+}, {
+  id: "corporate",
+  label: "🏢 Corporate"
+}, {
+  id: "other",
+  label: "🎨 Other"
+}];
+const CAT_INFO = {
+  restaurant: {
+    label: "Restaurant",
+    type: "Food & Dining",
+    desc: "Menu promos, new item launches, food content."
+  },
+  dental: {
+    label: "Dental",
+    type: "Health & Wellness",
+    desc: "Appointment posts, promos, before/after content."
+  },
+  beauty: {
+    label: "Beauty",
+    type: "Beauty & Salon",
+    desc: "Services, promos, transformation posts."
+  },
+  realestate: {
+    label: "Real Estate",
+    type: "Property",
+    desc: "Listing posts, featured properties, agent branding."
+  },
+  gym: {
+    label: "Gym",
+    type: "Health & Fitness",
+    desc: "Class schedules, transformation stories, promos."
+  },
+  travel: {
+    label: "Travel",
+    type: "Tour & Travel",
+    desc: "Destination packages, deals, itinerary posts."
+  },
+  jewelry: {
+    label: "Jewelry",
+    type: "Accessories",
+    desc: "Product showcases, sale posts, custom designs."
+  },
+  construction: {
+    label: "Construction",
+    type: "B2B / Trades",
+    desc: "Project highlights, service offers, testimonials."
+  },
+  coaching: {
+    label: "Coaching",
+    type: "Education",
+    desc: "Webinar promos, testimonials, course launches."
+  },
+  ecommerce: {
+    label: "Ecommerce",
+    type: "Online Store",
+    desc: "Product ads, flash sales, bundle promos."
+  },
+  corporate: {
+    label: "Corporate",
+    type: "Business / B2B",
+    desc: "Announcements, milestone posts, brand content."
+  },
+  other: {
+    label: "Other",
+    type: "Custom Niche",
+    desc: "We work with any niche! Message us to discuss."
+  }
+};
+/* ─── REAL CREATIVES (sorted per niche) ───────────────────────────────────────
+   81 sample creatives in /public/creatives/.  To add more later: drop the PNG in
+   /public/creatives, then add its number to the right niche in NICHE_MAP below. */
+const NICHES = [{
+  id: "all",
+  label: "🎨 All"
+}, {
+  id: "beauty",
+  label: "💆 Beauty & Spa"
+}, {
+  id: "health",
+  label: "💊 Health & Wellness"
+}, {
+  id: "flowers",
+  label: "💐 Flowers & Gifts"
+}, {
+  id: "solar",
+  label: "☀️ Solar Energy"
+}, {
+  id: "realestate",
+  label: "🏠 Real Estate"
+}, {
+  id: "jobs",
+  label: "✈️ Jobs Abroad"
+}];
+const NICHE_INFO = {
+  beauty: {
+    label: "Beauty & Spa",
+    type: "Spa & Salon",
+    desc: "Facials, laser, hair treatments & spa promos."
+  },
+  health: {
+    label: "Health & Wellness",
+    type: "Supplements",
+    desc: "Supplement benefits, promos & health awareness posts."
+  },
+  flowers: {
+    label: "Flowers & Gifts",
+    type: "Floral Shop",
+    desc: "Bouquet showcases, occasion promos & gift offers."
+  },
+  solar: {
+    label: "Solar Energy",
+    type: "Home Energy",
+    desc: "Solar upgrade offers, savings & home power ads."
+  },
+  realestate: {
+    label: "Real Estate",
+    type: "Property",
+    desc: "Property listings, model homes & investment offers."
+  },
+  jobs: {
+    label: "Jobs Abroad",
+    type: "Recruitment",
+    desc: "Hiring abroad, recruitment & application drives."
+  }
+};
+const NICHE_MAP = {
+  beauty: [1, 15, 17, 21, 23, 25, 27, 29, 30, 35, 42, 44, 48, 49],
+  health: [3, 6, 7, 16, 20, 24, 26, 28, 31, 32, 34, 38, 39, 41, 43, 47, 65, 68],
+  flowers: [8, 9, 10, 11, 12, 13, 18, 19, 59, 60, 61, 62, 63, 64, 69, 76],
+  solar: [2, 14, 22, 36, 37, 40, 45, 50, 51],
+  realestate: [53, 54, 56, 58, 67, 71, 73, 75, 78, 80],
+  jobs: [4, 5, 33, 46, 52, 55, 57, 66, 70, 72, 74, 77, 79, 81]
+};
+const PORTFOLIO_ITEMS = Object.keys(NICHE_MAP).flatMap(niche => NICHE_MAP[niche].map(n => ({
+  id: `c-${n}`,
+  src: `/creatives/creative-${String(n).padStart(2, "0")}.png`,
+  catId: niche,
+  label: NICHE_INFO[niche].label,
+  type: NICHE_INFO[niche].type
+})));
+/* curated home-page spread: first 2 of each niche = nice variety */
+const HOME_PREVIEW = Object.keys(NICHE_MAP).flatMap(niche => PORTFOLIO_ITEMS.filter(i => i.catId === niche).slice(0, 2));
+
+/* ─── OTHER DESIGNS ────────────────────────────────────────────────────────────
+   Banners, FB covers, flyers, posters, menu boards.  Files in /public/designs/.
+   To add more: drop {type}-N.jpg in /public/designs and bump the count below. */
+const DESIGN_TYPES = [{
+  id: "all",
+  label: "🎨 All"
+}, {
+  id: "banner",
+  label: "🖼️ Banners"
+}, {
+  id: "cover",
+  label: "📱 FB Covers"
+}, {
+  id: "flyer",
+  label: "📄 Flyers"
+}, {
+  id: "poster",
+  label: "📌 Posters"
+}, {
+  id: "menu",
+  label: "🍽️ Menu Boards"
+}];
+const DESIGN_INFO = {
+  banner: {
+    label: "Banner Design",
+    type: "Web & Ads",
+    desc: "Wide banners for promos, websites & events.",
+    from: "₱499"
+  },
+  cover: {
+    label: "FB Cover Photo",
+    type: "Social",
+    desc: "Professional Facebook page cover designs.",
+    from: "₱499"
+  },
+  flyer: {
+    label: "Flyer Design",
+    type: "Print & Digital",
+    desc: "Promo flyers for offers, events & menus.",
+    from: "₱499"
+  },
+  poster: {
+    label: "Poster Design",
+    type: "Print",
+    desc: "Eye-catching posters for big announcements.",
+    from: "₱499"
+  },
+  menu: {
+    label: "Menu Board",
+    type: "Food & Beverage",
+    desc: "Menu boards for restaurants, cafés & stalls.",
+    from: "₱499"
+  }
+};
+const DESIGN_COUNT = {
+  banner: 5,
+  cover: 5,
+  flyer: 5,
+  poster: 5,
+  menu: 5
+};
+const DESIGN_ITEMS = Object.keys(DESIGN_COUNT).flatMap(t => Array.from({
+  length: DESIGN_COUNT[t]
+}, (_, i) => ({
+  id: `d-${t}-${i + 1}`,
+  src: `/designs/${t}-${i + 1}.jpg`,
+  catId: t,
+  label: DESIGN_INFO[t].label,
+  type: DESIGN_INFO[t].type,
+  from: DESIGN_INFO[t].from
+})));
+const AD_PACKAGES = [{
+  id: "p1",
+  name: "Starter",
+  price: "₱999",
+  tag: "Perfect to start",
+  badge: null,
+  cls: "",
+  feats: ["30 Static Images", "15 Captions", "2–4 Day Turnaround", "1 Revision Round"]
+}, {
+  id: "p2",
+  name: "Standard",
+  price: "₱1,499",
+  tag: "Most popular",
+  badge: "🔥 Most Popular",
+  cls: "featured",
+  feats: ["60 Static Images", "60 Captions", "2–5 Day Turnaround", "2 Revision Rounds", "Priority Support"]
+}, {
+  id: "p3",
+  name: "Premium",
+  price: "₱2,299",
+  tag: "Best value",
+  badge: "💎 Best Value",
+  cls: "",
+  feats: ["90 Static Images", "90 Captions", "2–6 Day Turnaround", "Unlimited Revisions", "Priority Support"]
+}, {
+  id: "p4",
+  name: "Done-For-You",
+  price: "₱2,999",
+  tag: "We handle it all",
+  badge: "🤖 DFY",
+  cls: "",
+  feats: ["30 Posts / Month", "1 Month Posting", "Captions Included", "Content Calendar", "Page Management"]
+}, {
+  id: "p5",
+  name: "DFY Pro",
+  price: "₱4,999",
+  tag: "Full system",
+  badge: "🚀 All-In-One",
+  cls: "",
+  feats: ["60 Posts / Month", "2 Months Posting", "Full Content Creation", "Scheduling Included", "Monthly Report", "Priority Support"]
+}];
+const OTHER_SERVICES = [{
+  id: "banner",
+  icon: "🏷️",
+  label: "Banner Design",
+  from: "₱499",
+  color: "#7B3FF5",
+  desc: "Eye-catching banners for promotions, events, websites, and more.",
+  tiers: [{
+    name: "Basic",
+    color: "#7B3FF5",
+    price: "₱499",
+    inc: "1 Banner Design",
+    best: false
+  }, {
+    name: "Standard",
+    color: "#7B3FF5",
+    price: "₱999",
+    inc: "3 Banner Designs",
+    best: true
+  }, {
+    name: "Premium",
+    color: "#7B3FF5",
+    price: "₱1,499",
+    inc: "5 Banner Designs",
+    best: false
+  }]
+}, {
+  id: "cover",
+  icon: "📱",
+  label: "FB Cover Photo",
+  from: "₱499",
+  color: "#1B3A8C",
+  desc: "Custom cover photos that make your Facebook page look professional and trustworthy.",
+  tiers: [{
+    name: "Basic",
+    color: "#1B3A8C",
+    price: "₱499",
+    inc: "1 Cover Photo",
+    best: false
+  }, {
+    name: "Standard",
+    color: "#1B3A8C",
+    price: "₱999",
+    inc: "3 Cover Photos",
+    best: true
+  }, {
+    name: "Premium",
+    color: "#1B3A8C",
+    price: "₱1,499",
+    inc: "5 Cover Photos",
+    best: false
+  }]
+}, {
+  id: "flyer",
+  icon: "📄",
+  label: "Flyer Design",
+  from: "₱499",
+  color: "#E65100",
+  desc: "Perfect for promotions, events, businesses, and special announcements.",
+  tiers: [{
+    name: "Basic",
+    color: "#E65100",
+    price: "₱499",
+    inc: "2 Flyer Pages",
+    best: false
+  }, {
+    name: "Standard",
+    color: "#E65100",
+    price: "₱999",
+    inc: "5 Flyer Pages",
+    best: true
+  }, {
+    name: "Premium",
+    color: "#E65100",
+    price: "₱1,499",
+    inc: "8 Flyer Pages",
+    best: false
+  }]
+}, {
+  id: "poster",
+  icon: "🗂️",
+  label: "Poster Design",
+  from: "₱499",
+  color: "#C62828",
+  desc: "Attention-grabbing posters for events, promotions, hiring, and more.",
+  tiers: [{
+    name: "Basic",
+    color: "#C62828",
+    price: "₱499",
+    inc: "2 Poster Designs",
+    best: false
+  }, {
+    name: "Standard",
+    color: "#C62828",
+    price: "₱999",
+    inc: "5 Poster Designs",
+    best: true
+  }, {
+    name: "Premium",
+    color: "#C62828",
+    price: "₱1,499",
+    inc: "8 Poster Designs",
+    best: false
+  }]
+}, {
+  id: "menu",
+  icon: "🍽️",
+  label: "Menu Board",
+  from: "₱999",
+  color: "#2E7D32",
+  desc: "Professional menu boards for restaurants, cafes, and food businesses.",
+  tiers: [{
+    name: "Basic",
+    color: "#2E7D32",
+    price: "₱999",
+    inc: "2 Menu Pages",
+    best: false
+  }, {
+    name: "Standard",
+    color: "#2E7D32",
+    price: "₱1,499",
+    inc: "4 Menu Pages",
+    best: true
+  }, {
+    name: "Premium",
+    color: "#2E7D32",
+    price: "₱1,999",
+    inc: "5 Menu Pages",
+    best: false
+  }]
+}, {
+  id: "logo",
+  icon: "✍️",
+  label: "Logo Design",
+  from: "₱499",
+  color: "#1A1A1A",
+  desc: "Unique and memorable logo concepts that represent your brand identity.",
+  tiers: [{
+    name: "Basic",
+    color: "#1A1A1A",
+    price: "₱499",
+    inc: "1 Logo Concept",
+    best: false
+  }, {
+    name: "Standard",
+    color: "#1A1A1A",
+    price: "₱999",
+    inc: "3 Logo Concepts",
+    best: true
+  }, {
+    name: "Premium",
+    color: "#888",
+    price: null,
+    inc: "Not Available",
+    best: false,
+    na: true
+  }]
+}, {
+  id: "catalog",
+  icon: "📦",
+  label: "Product Catalog",
+  from: "₱999",
+  color: "#E65100",
+  desc: "Clean and organized catalog layouts to showcase your products.",
+  tiers: [{
+    name: "Basic",
+    color: "#E65100",
+    price: "₱999",
+    inc: "Up to 5 Products",
+    best: false
+  }, {
+    name: "Standard",
+    color: "#E65100",
+    price: "₱1,499",
+    inc: "Up to 10 Products",
+    best: true
+  }, {
+    name: "Premium",
+    color: "#E65100",
+    price: "₱1,999",
+    inc: "Up to 20 Products",
+    best: false
+  }]
+}];
+const TESTIMONIALS = [{
+  text: "Grabe ang output! Professional kaayo! Daghan ang nagpamessage after namon i-post.",
+  name: "Maria S.",
+  biz: "Restaurant, Davao",
+  init: "M"
+}, {
+  text: "3 days lang tapos na lahat ng 60 images. Fast and quality! Highly recommended!",
+  name: "Dr. John D.",
+  biz: "Dental Clinic, QC",
+  init: "J"
+}, {
+  text: "Best investment for my salon! Mas maraming bookings since nagbago ang creatives namin!",
+  name: "Ana R.",
+  biz: "Beauty Salon, Cebu",
+  init: "A"
+}, {
+  text: "Professional ang work! Sinunod lahat ng brand guidelines. 10/10 satisfied!",
+  name: "Carlo M.",
+  biz: "Real Estate, Manila",
+  init: "C"
+}, {
+  text: "Hindi ako makapaniwala sa ganda! Pinaka-sulit na content service na nasubukan ko.",
+  name: "Lea B.",
+  biz: "Online Shop",
+  init: "L"
+}, {
+  text: "Malaking tulong sa negosyo. Mas professional na ang dating ng FB page namin!",
+  name: "RJ T.",
+  biz: "Gym, Batangas",
+  init: "R"
+}];
+const FAQS = [{
+  q: "How long is the turnaround time?",
+  a: "Most projects are completed within 2–6 business days depending on the package size."
+}, {
+  q: "Can I use my own logo and brand colors?",
+  a: "Yes! We will use your existing logo, colors, and brand guidelines to create consistent on-brand creatives."
+}, {
+  q: "Do captions come included?",
+  a: "Yes! Captions are included in all content packages. Starter gets 15 captions; Standard and above include captions for all images."
+}, {
+  q: "Can you work with any niche?",
+  a: "Absolutely! We serve restaurants, dental, beauty, real estate, gyms, travel, jewelry, coaching, ecommerce, corporate, and more."
+}, {
+  q: "Do you offer revisions?",
+  a: "Yes. Starter gets 1 revision, Standard gets 2, Premium gets unlimited until you're 100% satisfied."
+}, {
+  q: "How do I order?",
+  a: "Simple! Send us a message on Facebook and we'll guide you step by step through the process."
+}, {
+  q: "Can you schedule posts too?",
+  a: "Yes! Our Done-For-You and DFY Pro packages include content scheduling and page management."
+}, {
+  q: "What other designs do you offer?",
+  a: "Besides static images, we also do banners, FB cover photos, flyers, posters, menu boards, logos, and product catalogs — each with their own pricing!"
+}];
+
+/* ─── SERVICE EXPAND PANEL ────────────────────────────────────────────────── */
+function AdPanel() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "svc-expand"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "svc-expand-header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "svc-expand-title"
+  }, "\uD83D\uDDBC\uFE0F Ad Creatives & Content Images"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".72rem",
+      color: "rgba(255,255,255,.65)"
+    }
+  }, "Swipe to see all packages \u2192")), /*#__PURE__*/React.createElement("div", {
+    className: "pkg-grid"
+  }, AD_PACKAGES.map(pkg => /*#__PURE__*/React.createElement("div", {
+    key: pkg.id,
+    className: `pkg-mini ${pkg.cls}`
+  }, pkg.badge && /*#__PURE__*/React.createElement("div", {
+    className: "pkg-mini-badge"
+  }, pkg.badge), /*#__PURE__*/React.createElement("div", {
+    className: "pkg-mini-name"
+  }, pkg.name), /*#__PURE__*/React.createElement("div", {
+    className: "pkg-mini-price"
+  }, pkg.price), /*#__PURE__*/React.createElement("div", {
+    className: "pkg-mini-tag"
+  }, pkg.tag), /*#__PURE__*/React.createElement("div", {
+    className: "pkg-mini-div"
+  }), pkg.feats.map(f => /*#__PURE__*/React.createElement("div", {
+    key: f,
+    className: "pkg-mini-feat"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pchk"
+  }, "\u2713"), f)), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "pkg-mini-cta"
+  }, "Order Now \u2192")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "0 18px 18px",
+      background: "#F0F2FF",
+      margin: "0 18px 18px",
+      borderRadius: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".76rem",
+      fontWeight: 700,
+      color: "#1B3A8C",
+      marginBottom: 6,
+      paddingTop: 12
+    }
+  }, "\uD83D\uDCA1 Not sure which package?"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".74rem",
+      color: "#64748B",
+      lineHeight: 1.7,
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("b", null, "\u20B1999"), " \u2014 Just starting content marketing", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", null, "\u20B11,499"), " \u2014 Active social media presence", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", null, "\u20B12,299"), " \u2014 Needs bulk content supply", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", null, "\u20B12,999 DFY"), " \u2014 Too busy? We handle everything", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("b", null, "\u20B14,999 DFY Pro"), " \u2014 Full 2-month outsourcing"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-navy",
+    style: {
+      padding: "10px 18px",
+      fontSize: ".8rem",
+      borderRadius: 10
+    }
+  }, "\uD83D\uDCAC Get a Recommendation")));
+}
+function OdsPanel({
+  serviceId
+}) {
+  const [active, setActive] = useState(serviceId || "banner");
+  const cur = OTHER_SERVICES.find(s => s.id === active) || OTHER_SERVICES[0];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "svc-expand"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "svc-expand-header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "svc-expand-title"
+  }, "\uD83C\uDFA8 Other Design Services"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".72rem",
+      color: "rgba(255,255,255,.65)"
+    }
+  }, "Tap a service to see pricing")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      overflowX: "auto",
+      padding: "14px 16px 10px",
+      WebkitOverflowScrolling: "touch",
+      scrollbarWidth: "none"
+    }
+  }, OTHER_SERVICES.map(s => /*#__PURE__*/React.createElement("button", {
+    key: s.id,
+    onClick: () => setActive(s.id),
+    style: {
+      flexShrink: 0,
+      padding: "7px 14px",
+      borderRadius: 100,
+      border: `2px solid ${active === s.id ? s.color : cur.color + "30"}`,
+      background: active === s.id ? s.color : "#fff",
+      color: active === s.id ? "#fff" : "#374151",
+      fontSize: ".76rem",
+      fontWeight: 700,
+      cursor: "pointer",
+      whiteSpace: "nowrap",
+      transition: "all .2s",
+      display: "flex",
+      alignItems: "center",
+      gap: 6
+    }
+  }, s.icon, " ", s.label))), /*#__PURE__*/React.createElement("div", {
+    className: "ods-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 44,
+      height: 44,
+      borderRadius: 11,
+      background: cur.color + "18",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "1.5rem",
+      flexShrink: 0
+    }
+  }, cur.icon), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Nunito',sans-serif",
+      fontWeight: 900,
+      fontSize: "1.05rem",
+      color: "#1B3A8C"
+    }
+  }, cur.label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".74rem",
+      color: "#64748B"
+    }
+  }, cur.desc))), /*#__PURE__*/React.createElement("div", {
+    className: "tier-grid"
+  }, cur.tiers.map((t, ti) => /*#__PURE__*/React.createElement("div", {
+    key: ti,
+    className: `tier-card${t.best ? " best" : ""}`
+  }, t.best && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: t.color,
+      color: "#fff",
+      fontSize: ".58rem",
+      fontWeight: 800,
+      padding: "2px 9px",
+      borderRadius: 100
+    }
+  }, "\u2605 BEST")), /*#__PURE__*/React.createElement("div", {
+    className: "tier-lbl",
+    style: {
+      background: t.na ? "#F1F5F9" : t.color + "18",
+      color: t.na ? "#CBD5E1" : t.color
+    }
+  }, t.name), t.na ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "tier-price",
+    style: {
+      color: "#CBD5E1",
+      fontSize: "1rem"
+    }
+  }, "\u2014"), /*#__PURE__*/React.createElement("div", {
+    className: "tier-na"
+  }, "Not Available")) : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "tier-price",
+    style: {
+      color: t.best ? t.color : "#1B3A8C"
+    }
+  }, t.price), /*#__PURE__*/React.createElement("div", {
+    className: "tier-inc"
+  }, t.inc))))), /*#__PURE__*/React.createElement("div", {
+    className: "ods-cta-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ods-cta-note"
+  }, "\u26A1 Fast turnaround \xB7 High quality designs \xB7 Any business niche"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-navy",
+    style: {
+      padding: "10px 18px",
+      fontSize: ".8rem",
+      borderRadius: 10,
+      flexShrink: 0
+    }
+  }, "\uD83D\uDCAC Order Now"))));
+}
+
+/* ─── SERVICE PICKER (reusable) ───────────────────────────────────────────── */
+function ServicePicker() {
+  const [active, setActive] = useState(null);
+  const toggle = v => setActive(active === v ? null : v);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-grid",
+    style: {
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `svc-main-card${active === "ad" ? " active" : ""}`,
+    onClick: () => toggle("ad")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-icon"
+  }, "\uD83D\uDDBC\uFE0F"), /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-name"
+  }, "Ad Creatives & Content Images"), /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-sub"
+  }, "Static images for social media & ads"), /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-from"
+  }, "From \u20B1999"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".7rem",
+      color: active === "ad" ? "#1B3A8C" : "#7B3FF5",
+      fontWeight: 700,
+      marginTop: 2
+    }
+  }, active === "ad" ? "▲ Hide details" : "▼ See packages")), /*#__PURE__*/React.createElement("button", {
+    className: `svc-main-card${active === "other" ? " active" : ""}`,
+    onClick: () => toggle("other")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-icon"
+  }, "\uD83C\uDFA8"), /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-name"
+  }, "Other Design Services"), /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-sub"
+  }, "Banner, Flyer, Logo, Menu & more"), /*#__PURE__*/React.createElement("div", {
+    className: "svc-main-from"
+  }, "From \u20B1499"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".7rem",
+      color: active === "other" ? "#1B3A8C" : "#7B3FF5",
+      fontWeight: 700,
+      marginTop: 2
+    }
+  }, active === "other" ? "▲ Hide details" : "▼ See services"))), active === "ad" && /*#__PURE__*/React.createElement(AdPanel, null), active === "other" && /*#__PURE__*/React.createElement(OdsPanel, null), !active && /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      padding: "1.2rem",
+      background: "var(--light-bg)",
+      borderRadius: 14,
+      fontSize: ".85rem",
+      color: "var(--muted)"
+    }
+  }, "\uD83D\uDC46 Tap a service card above to see packages & pricing"));
+}
+
+/* ─── NAV ─────────────────────────────────────────────────────────────────── */
+function Nav({
+  page,
+  setPage
+}) {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  const go = p => {
+    setPage(p);
+    setOpen(false);
+    window.scrollTo(0, 0);
+  };
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+  const pages = ["home", "portfolio", "pricing", "reviews", "faq", "contact"];
+  const labels = {
+    home: "Home",
+    portfolio: "Portfolio",
+    pricing: "Pricing",
+    reviews: "Reviews",
+    faq: "FAQ",
+    contact: "Contact"
+  };
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("nav", {
+    className: `nav${scrolled ? " scrolled" : ""}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand-logo",
+    onClick: () => go("home")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "brand-logo-icon"
+  }, /*#__PURE__*/React.createElement(LogoIcon, {
+    size: 22
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "brand-logo-text"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "t1"
+  }, "High Converting"), /*#__PURE__*/React.createElement("span", {
+    className: "t2"
+  }, "Static Images"))), /*#__PURE__*/React.createElement("div", {
+    className: "nav-links"
+  }, pages.map(p => /*#__PURE__*/React.createElement("a", {
+    key: p,
+    onClick: () => go(p),
+    className: page === p ? "active" : ""
+  }, labels[p])), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "nav-cta-btn"
+  }, "\uD83D\uDCAC Message Us")), /*#__PURE__*/React.createElement("button", {
+    className: `hb${open ? " open" : ""}`,
+    onClick: () => setOpen(!open)
+  }, /*#__PURE__*/React.createElement("span", null), /*#__PURE__*/React.createElement("span", null), /*#__PURE__*/React.createElement("span", null))), /*#__PURE__*/React.createElement("div", {
+    className: `drawer${open ? " open" : ""}`
+  }, pages.map(p => /*#__PURE__*/React.createElement("a", {
+    key: p,
+    onClick: () => go(p)
+  }, labels[p], /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: "var(--muted)"
+    }
+  }, "\u203A"))), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "drawer-cta"
+  }, "\uD83D\uDCAC Message Us on Facebook")));
+}
+function FloatFB() {
+  return /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "float-fb",
+    title: "Message on Facebook"
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "24",
+    height: "24",
+    viewBox: "0 0 24 24",
+    fill: "#fff"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 2C6.477 2 2 6.145 2 11.243c0 3.022 1.517 5.71 3.888 7.461V22l3.544-1.949c.947.263 1.95.404 2.988.404 5.523 0 10-4.145 10-9.243S17.523 2 12 2zm1.007 12.445l-2.549-2.72-4.97 2.72 5.468-5.803 2.61 2.72 4.908-2.72-5.467 5.803z"
+  })));
+}
+function Footer({
+  setPage
+}) {
+  const go = p => {
+    setPage(p);
+    window.scrollTo(0, 0);
+  };
+  return /*#__PURE__*/React.createElement("footer", {
+    className: "footer"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "footer-logo-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "footer-logo-icon"
+  }, /*#__PURE__*/React.createElement(LogoIcon, {
+    size: 18
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "footer-logo-name"
+  }, "High Converting Static Images")), /*#__PURE__*/React.createElement("p", {
+    className: "footer-desc"
+  }, "Professional content that makes your business look more professional online. Fast turnaround. Any niche."), /*#__PURE__*/React.createElement("div", {
+    className: "footer-links"
+  }, ["home", "portfolio", "pricing", "reviews", "faq", "contact"].map(p => /*#__PURE__*/React.createElement("span", {
+    key: p,
+    className: "fl-link",
+    onClick: () => go(p),
+    style: {
+      textTransform: "capitalize"
+    }
+  }, p === "home" ? "Home" : p.charAt(0).toUpperCase() + p.slice(1))), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "fl-link"
+  }, "Facebook Page"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "fl-link"
+  }, "Message Us")), /*#__PURE__*/React.createElement("div", {
+    className: "footer-bot"
+  }, "\xA9 2025 High Converting Static Images. All rights reserved."));
+}
+
+/* ─── HOME ────────────────────────────────────────────────────────────────── */
+function HomePage({
+  setPage
+}) {
+  const [faq, setFaq] = useState(null);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pe"
+  }, /*#__PURE__*/React.createElement("section", {
+    className: "hero"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hero-orb",
+    style: {
+      width: 400,
+      height: 400,
+      background: "rgba(123,63,245,.15)",
+      top: -80,
+      right: -80
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "hero-orb",
+    style: {
+      width: 300,
+      height: 300,
+      background: "rgba(27,58,140,.1)",
+      bottom: 60,
+      left: "10%"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "hero-logo-big anim a1"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hero-logo-icon"
+  }, /*#__PURE__*/React.createElement(LogoIcon, {
+    size: 44
+  }))), /*#__PURE__*/React.createElement("h1", {
+    className: "anim a2"
+  }, "Make Your Business Look ", /*#__PURE__*/React.createElement("span", null, "More Professional"), " Online"), /*#__PURE__*/React.createElement("p", {
+    className: "anim a3"
+  }, "Ad creatives, banners, flyers, logos, menu boards & done-for-you content \u2014 starting at ", /*#__PURE__*/React.createElement("strong", null, "\u20B1499"), ". Fast turnaround. Any niche."), /*#__PURE__*/React.createElement("div", {
+    className: "hero-btns anim a4"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-navy",
+    onClick: () => {
+      setPage("pricing");
+      window.scrollTo(0, 0);
+    }
+  }, "\uD83C\uDFA8 See All Services & Pricing"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-outline"
+  }, "\uD83D\uDCAC Message Us on Facebook"))), /*#__PURE__*/React.createElement("div", {
+    className: "trust"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "trust-inner"
+  }, [["📦", "500K+", "Creatives Made"], ["⚡", "2–6 Days", "Turnaround"], ["🌍", "20+", "Industries"], ["✅", "₱499", "Starting Price"], ["🤖", "✓", "Done-For-You"]].map(([ic, n, l]) => /*#__PURE__*/React.createElement("div", {
+    key: l,
+    className: "trust-item"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "trust-dot"
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "trust-num"
+  }, n), /*#__PURE__*/React.createElement("div", {
+    className: "trust-lbl"
+  }, l)))))), /*#__PURE__*/React.createElement("section", {
+    className: "sec"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Find Your Service"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "What Do You Need?"), /*#__PURE__*/React.createElement("p", {
+    className: "ssub"
+  }, "Tap a service below to instantly see packages and pricing that fit your business.")), /*#__PURE__*/React.createElement(ServicePicker, null)), /*#__PURE__*/React.createElement("section", {
+    className: "sec sec-light"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Our Work"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "Sample Creatives"), /*#__PURE__*/React.createElement("p", {
+    className: "ssub"
+  }, "Browse by industry \u2014 all starting at \u20B1999.")), /*#__PURE__*/React.createElement("div", {
+    className: "pgrid"
+  }, HOME_PREVIEW.map(item => /*#__PURE__*/React.createElement("div", {
+    key: item.id,
+    className: "pitem",
+    onClick: () => {
+      setPage("portfolio");
+      window.scrollTo(0, 0);
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: item.src,
+    alt: `${item.label} creative`,
+    loading: "lazy",
+    style: {
+      width: "100%",
+      display: "block"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "from-tag"
+  }, "\u20B1999+"), /*#__PURE__*/React.createElement("div", {
+    className: "pover"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".6rem",
+      fontWeight: 800,
+      color: "rgba(255,255,255,.7)",
+      letterSpacing: ".08em",
+      textTransform: "uppercase"
+    }
+  }, item.type), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".88rem",
+      fontWeight: 700,
+      color: "#fff"
+    }
+  }, item.label))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      marginTop: "1.5rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-navy",
+    onClick: () => {
+      setPage("portfolio");
+      window.scrollTo(0, 0);
+    }
+  }, "View Full Portfolio \u2192"))), /*#__PURE__*/React.createElement("section", {
+    className: "sec"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Client Feedback"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "What Clients Say")), /*#__PURE__*/React.createElement("div", {
+    className: "tscroll"
+  }, TESTIMONIALS.map((t, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "tcard"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "tstars"
+  }, "\u2605\u2605\u2605\u2605\u2605"), /*#__PURE__*/React.createElement("p", {
+    className: "ttext"
+  }, "\"", t.text, "\""), /*#__PURE__*/React.createElement("div", {
+    className: "tauthor"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "tavatar"
+  }, t.init), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "tname"
+  }, t.name), /*#__PURE__*/React.createElement("div", {
+    className: "tbiz"
+  }, t.biz))))))), /*#__PURE__*/React.createElement("section", {
+    className: "sec sec-gray"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Questions"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "Quick Answers")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 600
+    }
+  }, FAQS.slice(0, 4).map((f, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "faq-item"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "faq-q",
+    onClick: () => setFaq(faq === i ? null : i)
+  }, f.q, /*#__PURE__*/React.createElement("span", {
+    className: `faq-icon${faq === i ? " open" : ""}`
+  }, "+")), faq === i && /*#__PURE__*/React.createElement("div", {
+    className: "faq-a"
+  }, f.a)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: "1.2rem"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-navy",
+    onClick: () => {
+      setPage("faq");
+      window.scrollTo(0, 0);
+    }
+  }, "See All FAQs \u2192"))), /*#__PURE__*/React.createElement("div", {
+    className: "cta-ban"
+  }, /*#__PURE__*/React.createElement("h2", null, "Ready To Get Started?"), /*#__PURE__*/React.createElement("p", null, "Message us and we'll help you find the perfect package!"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-red"
+  }, "\uD83D\uDCAC Send Us A Message")));
+}
+
+/* ─── PORTFOLIO ───────────────────────────────────────────────────────────── */
+function PortfolioPage() {
+  const [view, setView] = useState("creatives");
+  const [cat, setCat] = useState("all");
+  const [dcat, setDcat] = useState("all");
+  const [lb, setLb] = useState(null);
+  const isCre = view === "creatives";
+  const pills = isCre ? NICHES : DESIGN_TYPES;
+  const activeCat = isCre ? cat : dcat;
+  const setActiveCat = isCre ? setCat : setDcat;
+  const source = isCre ? PORTFOLIO_ITEMS : DESIGN_ITEMS;
+  const info = isCre ? NICHE_INFO : DESIGN_INFO;
+  const items = activeCat === "all" ? source : source.filter(i => i.catId === activeCat);
+  const lbIdx = items.findIndex(i => i.id === lb);
+  const switchView = v => {
+    setView(v);
+    setLb(null);
+  };
+  const tabStyle = on => on ? {
+    background: "var(--navy)",
+    color: "#fff",
+    borderColor: "var(--navy)"
+  } : {};
+  const card = item => /*#__PURE__*/React.createElement("div", {
+    key: item.id,
+    className: "pitem",
+    onClick: () => setLb(item.id)
+  }, /*#__PURE__*/React.createElement("img", {
+    src: item.src,
+    alt: `${item.label} sample`,
+    loading: "lazy",
+    style: {
+      width: "100%",
+      display: "block"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "from-tag"
+  }, item.from ? `${item.from}+` : "₱999+"), /*#__PURE__*/React.createElement("div", {
+    className: "pover"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".6rem",
+      fontWeight: 800,
+      color: "rgba(255,255,255,.7)",
+      letterSpacing: ".08em",
+      textTransform: "uppercase"
+    }
+  }, item.type), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".88rem",
+      fontWeight: 700,
+      color: "#fff"
+    }
+  }, item.label)));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pe",
+    style: {
+      paddingTop: 68
+    }
+  }, /*#__PURE__*/React.createElement("section", {
+    className: "sec"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr c"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Our Work"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "Full Portfolio"), /*#__PURE__*/React.createElement("p", {
+    className: "ssub",
+    style: {
+      margin: "8px auto 0"
+    }
+  }, PORTFOLIO_ITEMS.length, " ad creatives + ", DESIGN_ITEMS.length, " other designs. Starting at \u20B1499.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      justifyContent: "center",
+      marginBottom: "1.1rem",
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "cat-pill",
+    style: tabStyle(isCre),
+    onClick: () => switchView("creatives")
+  }, "\uD83D\uDDBC\uFE0F Ad Creatives"), /*#__PURE__*/React.createElement("button", {
+    className: "cat-pill",
+    style: tabStyle(!isCre),
+    onClick: () => switchView("designs")
+  }, "\uD83C\uDFA8 Other Designs")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: ".72rem",
+      fontWeight: 700,
+      color: "var(--muted)",
+      marginBottom: ".8rem"
+    }
+  }, "\uD83D\uDC46 Swipe to filter ", isCre ? "by industry" : "by type"), /*#__PURE__*/React.createElement("div", {
+    className: "cat-scroll"
+  }, pills.map(c => /*#__PURE__*/React.createElement("button", {
+    key: c.id,
+    className: `cat-pill${activeCat === c.id ? " active" : ""}`,
+    onClick: () => setActiveCat(c.id)
+  }, c.label))), activeCat === "all" ? pills.filter(c => c.id !== "all").map(c => {
+    const gi = source.filter(i => i.catId === c.id);
+    if (!gi.length) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      style: {
+        marginBottom: "2rem"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 8,
+        paddingBottom: 8,
+        marginBottom: ".9rem",
+        borderBottom: "2px solid var(--border)"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontWeight: 800,
+        fontSize: "1rem",
+        color: "var(--navy)"
+      }
+    }, c.label, " ", /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "var(--muted)",
+        fontWeight: 700,
+        fontSize: ".78rem"
+      }
+    }, "(", gi.length, ")")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: ".74rem",
+        color: "var(--muted)",
+        marginTop: 2
+      }
+    }, info[c.id].desc)), /*#__PURE__*/React.createElement("div", {
+      style: {
+        background: "var(--red)",
+        color: "#fff",
+        fontWeight: 800,
+        fontSize: ".7rem",
+        padding: "5px 12px",
+        borderRadius: 100,
+        flexShrink: 0
+      }
+    }, "From ", isCre ? "₱999" : info[c.id].from)), /*#__PURE__*/React.createElement("div", {
+      className: "pgrid"
+    }, gi.map(card)));
+  }) : /*#__PURE__*/React.createElement(React.Fragment, null, info[activeCat] && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "var(--light-bg)",
+      borderRadius: 12,
+      padding: "12px 14px",
+      marginBottom: "1.2rem",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flexWrap: "wrap",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 800,
+      fontSize: ".88rem",
+      color: "var(--navy)"
+    }
+  }, info[activeCat].label, isCre ? " Creatives" : ""), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".76rem",
+      color: "var(--muted)",
+      marginTop: 2
+    }
+  }, info[activeCat].desc)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "var(--red)",
+      color: "#fff",
+      fontWeight: 800,
+      fontSize: ".72rem",
+      padding: "5px 14px",
+      borderRadius: 100,
+      flexShrink: 0
+    }
+  }, "From ", isCre ? "₱999" : info[activeCat].from)), /*#__PURE__*/React.createElement("div", {
+    className: "pgrid"
+  }, items.map(card)))), lb && lbIdx >= 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(8,15,30,.95)",
+      zIndex: 2000,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    },
+    onClick: () => setLb(null)
+  }, /*#__PURE__*/React.createElement("button", {
+    style: {
+      position: "absolute",
+      top: 16,
+      right: 20,
+      background: "none",
+      border: "none",
+      color: "#fff",
+      fontSize: "1.8rem",
+      cursor: "pointer"
+    },
+    onClick: () => setLb(null)
+  }, "\u2715"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: "85vw",
+      maxWidth: 420,
+      maxHeight: "82vh",
+      borderRadius: 16,
+      overflow: "hidden",
+      display: "flex",
+      flexDirection: "column"
+    },
+    onClick: e => e.stopPropagation()
+  }, /*#__PURE__*/React.createElement("img", {
+    src: items[lbIdx].src,
+    alt: items[lbIdx].label,
+    style: {
+      width: "100%",
+      maxHeight: "68vh",
+      objectFit: "contain",
+      display: "block",
+      background: "#0a1024"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#0D1E4A",
+      padding: "12px 16px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "rgba(255,255,255,.6)",
+      fontSize: ".62rem",
+      fontWeight: 800,
+      textTransform: "uppercase",
+      letterSpacing: ".06em"
+    }
+  }, items[lbIdx].type), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "#fff",
+      fontWeight: 800,
+      fontSize: ".9rem"
+    }
+  }, items[lbIdx].label)), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    style: {
+      background: "var(--red)",
+      color: "#fff",
+      fontWeight: 800,
+      fontSize: ".76rem",
+      padding: "8px 16px",
+      borderRadius: 100,
+      textDecoration: "none"
+    }
+  }, "Order \u2192"))), /*#__PURE__*/React.createElement("button", {
+    style: {
+      position: "absolute",
+      left: "3%",
+      top: "50%",
+      transform: "translateY(-50%)",
+      background: "rgba(255,255,255,.1)",
+      border: "none",
+      color: "#fff",
+      fontSize: "1.3rem",
+      padding: "12px 14px",
+      borderRadius: 10,
+      cursor: "pointer"
+    },
+    onClick: e => {
+      e.stopPropagation();
+      setLb(items[(lbIdx - 1 + items.length) % items.length].id);
+    }
+  }, "\u2039"), /*#__PURE__*/React.createElement("button", {
+    style: {
+      position: "absolute",
+      right: "3%",
+      top: "50%",
+      transform: "translateY(-50%)",
+      background: "rgba(255,255,255,.1)",
+      border: "none",
+      color: "#fff",
+      fontSize: "1.3rem",
+      padding: "12px 14px",
+      borderRadius: 10,
+      cursor: "pointer"
+    },
+    onClick: e => {
+      e.stopPropagation();
+      setLb(items[(lbIdx + 1) % items.length].id);
+    }
+  }, "\u203A")), /*#__PURE__*/React.createElement("div", {
+    className: "cta-ban"
+  }, /*#__PURE__*/React.createElement("h2", null, "Like What You See?"), /*#__PURE__*/React.createElement("p", null, "Message us your niche and we'll create custom samples for you!"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-red"
+  }, "\uD83D\uDCAC Message Us on Facebook")));
+}
+
+/* ─── PRICING ─────────────────────────────────────────────────────────────── */
+function PricingPage() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pe",
+    style: {
+      paddingTop: 68
+    }
+  }, /*#__PURE__*/React.createElement("section", {
+    className: "sec"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr c"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Pricing"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "All Services & Pricing"), /*#__PURE__*/React.createElement("p", {
+    className: "ssub",
+    style: {
+      margin: "8px auto 0"
+    }
+  }, "Tap a service card to see exact pricing and what's included \u2014 no hidden fees.")), /*#__PURE__*/React.createElement(ServicePicker, null)), /*#__PURE__*/React.createElement("section", {
+    className: "sec sec-gray"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Quick Reference"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle",
+    style: {
+      fontSize: "1.6rem"
+    }
+  }, "Full Price List")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: "auto"
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "ptable"
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, ["Service", "Basic", "Standard", "Premium"].map(h => /*#__PURE__*/React.createElement("th", {
+    key: h
+  }, h)))), /*#__PURE__*/React.createElement("tbody", null, [["Ad Creatives (Static Images)", "₱999 / 30 imgs", "₱1,499 / 60 imgs", "₱2,299 / 90 imgs"], ["Done-For-You Content", "—", "₱2,999 / 30 posts", "₱4,999 / 60 posts"], ["Banner Design", "₱499 / 1pc", "₱999 / 3pcs", "₱1,499 / 5pcs"], ["Facebook Cover Photo", "₱499 / 1pc", "₱999 / 3pcs", "₱1,499 / 5pcs"], ["Flyer Design", "₱499 / 2pgs", "₱999 / 5pgs", "₱1,499 / 8pgs"], ["Poster Design", "₱499 / 2pcs", "₱999 / 5pcs", "₱1,499 / 8pcs"], ["Menu Board Design", "₱999 / 2pgs", "₱1,499 / 4pgs", "₱1,999 / 5pgs"], ["Logo Design", "₱499 / 1 concept", "₱999 / 3 concepts", "N/A"], ["Product Catalog", "₱999 / 5 prods", "₱1,499 / 10 prods", "₱1,999 / 20 prods"]].map(([svc, ...tiers], i) => /*#__PURE__*/React.createElement("tr", {
+    key: i
+  }, /*#__PURE__*/React.createElement("td", {
+    style: {
+      fontWeight: 700,
+      color: "var(--navy)"
+    }
+  }, svc), tiers.map((t, ti) => /*#__PURE__*/React.createElement("td", {
+    key: ti,
+    className: t === "N/A" || t === "—" ? "na" : ""
+  }, t)))))))), /*#__PURE__*/React.createElement("div", {
+    className: "cta-ban"
+  }, /*#__PURE__*/React.createElement("h2", null, "Ready to Order?"), /*#__PURE__*/React.createElement("p", null, "Message us on Facebook and we'll get you started in minutes!"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-red"
+  }, "\uD83D\uDCAC Message Us on Facebook")));
+}
+
+/* ─── REVIEWS ─────────────────────────────────────────────────────────────── */
+function ReviewsPage() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pe",
+    style: {
+      paddingTop: 68
+    }
+  }, /*#__PURE__*/React.createElement("section", {
+    className: "sec"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr c"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Social Proof"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "What Clients Say"), /*#__PURE__*/React.createElement("p", {
+    className: "ssub",
+    style: {
+      margin: "8px auto 0"
+    }
+  }, "Real feedback from business owners across the Philippines.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(2,1fr)",
+      gap: 10,
+      marginBottom: "2rem"
+    }
+  }, [["★★★★★", "Average Rating"], ["500+", "Happy Clients"], ["20+", "Industries"], ["100%", "Satisfaction"]].map(([n, l]) => /*#__PURE__*/React.createElement("div", {
+    key: l,
+    style: {
+      background: "var(--light-bg)",
+      borderRadius: 14,
+      padding: "16px 12px",
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Nunito',sans-serif",
+      fontWeight: 900,
+      fontSize: "1.4rem",
+      color: "var(--navy)"
+    }
+  }, n), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: ".7rem",
+      color: "var(--muted)",
+      fontWeight: 500,
+      marginTop: 4
+    }
+  }, l)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 12
+    }
+  }, TESTIMONIALS.map((t, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "tcard",
+    style: {
+      width: "100%",
+      maxWidth: "100%"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "tstars"
+  }, "\u2605\u2605\u2605\u2605\u2605"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "var(--gray)",
+      borderRadius: "14px 14px 14px 4px",
+      padding: "12px 14px",
+      marginBottom: 12,
+      fontSize: ".84rem",
+      color: "var(--body)",
+      lineHeight: 1.7
+    }
+  }, t.text), /*#__PURE__*/React.createElement("div", {
+    className: "tauthor"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "tavatar"
+  }, t.init), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "tname"
+  }, t.name), /*#__PURE__*/React.createElement("div", {
+    className: "tbiz"
+  }, t.biz))))))), /*#__PURE__*/React.createElement("div", {
+    className: "cta-ban"
+  }, /*#__PURE__*/React.createElement("h2", null, "Ready to Be Our Next Success Story?"), /*#__PURE__*/React.createElement("p", null, "Join hundreds of satisfied businesses across the Philippines."), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-red"
+  }, "\uD83D\uDCAC Get Started Today")));
+}
+
+/* ─── FAQ ─────────────────────────────────────────────────────────────────── */
+function FAQPage() {
+  const [open, setOpen] = useState(null);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pe",
+    style: {
+      paddingTop: 68
+    }
+  }, /*#__PURE__*/React.createElement("section", {
+    className: "sec"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr c"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Questions"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "Frequently Asked Questions"), /*#__PURE__*/React.createElement("p", {
+    className: "ssub",
+    style: {
+      margin: "8px auto 0"
+    }
+  }, "Everything you need to know before ordering.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 620,
+      margin: "0 auto"
+    }
+  }, FAQS.map((f, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "faq-item"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "faq-q",
+    onClick: () => setOpen(open === i ? null : i)
+  }, f.q, /*#__PURE__*/React.createElement("span", {
+    className: `faq-icon${open === i ? " open" : ""}`
+  }, "+")), open === i && /*#__PURE__*/React.createElement("div", {
+    className: "faq-a"
+  }, f.a))))), /*#__PURE__*/React.createElement("div", {
+    className: "cta-ban"
+  }, /*#__PURE__*/React.createElement("h2", null, "Still Have Questions?"), /*#__PURE__*/React.createElement("p", null, "Just message us on Facebook \u2014 we reply fast!"), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-red"
+  }, "\uD83D\uDCAC Message Us")));
+}
+
+/* ─── CONTACT ─────────────────────────────────────────────────────────────── */
+function ContactPage() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pe",
+    style: {
+      paddingTop: 68
+    }
+  }, /*#__PURE__*/React.createElement("section", {
+    className: "sec"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "shdr c"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "slbl"
+  }, "Get In Touch"), /*#__PURE__*/React.createElement("h2", {
+    className: "stitle"
+  }, "Let's Work Together"), /*#__PURE__*/React.createElement("p", {
+    className: "ssub",
+    style: {
+      margin: "8px auto 0"
+    }
+  }, "Tell us what you need and we'll find the perfect package for your business!")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 480,
+      margin: "0 auto"
+    }
+  }, /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      background: "var(--grad-btn)",
+      color: "#fff",
+      padding: "17px",
+      borderRadius: 14,
+      fontWeight: 800,
+      fontSize: "1rem",
+      textDecoration: "none",
+      marginBottom: "1.2rem",
+      boxShadow: "0 4px 20px rgba(27,58,140,.28)"
+    }
+  }, "\uD83D\uDCAC Message Us Directly on Facebook"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      color: "var(--muted)",
+      fontSize: ".76rem",
+      fontWeight: 600,
+      marginBottom: "1.2rem",
+      display: "flex",
+      alignItems: "center",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      height: 1,
+      background: "var(--border)"
+    }
+  }), "OR fill out this form", /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      height: 1,
+      background: "var(--border)"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "fg"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "fl"
+  }, "Your Name"), /*#__PURE__*/React.createElement("input", {
+    className: "fi",
+    placeholder: "Juan dela Cruz",
+    type: "text"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "fg"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "fl"
+  }, "Service Needed"), /*#__PURE__*/React.createElement("select", {
+    className: "fi"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select a service..."), /*#__PURE__*/React.createElement("optgroup", {
+    label: "Ad Creatives & Content"
+  }, AD_PACKAGES.map(p => /*#__PURE__*/React.createElement("option", {
+    key: p.id
+  }, p.name, " \u2014 ", p.price))), /*#__PURE__*/React.createElement("optgroup", {
+    label: "Other Design Services"
+  }, OTHER_SERVICES.map(s => /*#__PURE__*/React.createElement("option", {
+    key: s.id
+  }, s.icon, " ", s.label, " \u2014 From ", s.from))), /*#__PURE__*/React.createElement("option", null, "Not sure yet, need recommendation"))), /*#__PURE__*/React.createElement("div", {
+    className: "fg"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "fl"
+  }, "Your Business / Niche"), /*#__PURE__*/React.createElement("select", {
+    className: "fi"
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select your industry..."), Object.values(CAT_INFO).map(c => /*#__PURE__*/React.createElement("option", {
+    key: c.label
+  }, c.label)))), /*#__PURE__*/React.createElement("div", {
+    className: "fg"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "fl"
+  }, "Message"), /*#__PURE__*/React.createElement("textarea", {
+    className: "fi",
+    placeholder: "Tell us more about your project..."
+  })), /*#__PURE__*/React.createElement("a", {
+    href: FB_URL,
+    target: "_blank",
+    className: "btn-navy",
+    style: {
+      width: "100%",
+      display: "block",
+      textAlign: "center",
+      padding: "15px",
+      borderRadius: 12
+    }
+  }, "\uD83D\uDCAC Send via Facebook Messenger"))));
+}
+
+/* ─── APP ─────────────────────────────────────────────────────────────────── */
+function App() {
+  const [page, setPage] = useState("home");
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, CSS), /*#__PURE__*/React.createElement(Nav, {
+    page: page,
+    setPage: setPage
+  }), page === "home" && /*#__PURE__*/React.createElement(HomePage, {
+    setPage: setPage
+  }), page === "portfolio" && /*#__PURE__*/React.createElement(PortfolioPage, null), page === "pricing" && /*#__PURE__*/React.createElement(PricingPage, null), page === "reviews" && /*#__PURE__*/React.createElement(ReviewsPage, null), page === "faq" && /*#__PURE__*/React.createElement(FAQPage, null), page === "contact" && /*#__PURE__*/React.createElement(ContactPage, null), /*#__PURE__*/React.createElement(Footer, {
+    setPage: setPage
+  }), /*#__PURE__*/React.createElement(FloatFB, null));
+}
+const _root=ReactDOM.createRoot(document.getElementById("root"));_root.render(React.createElement(App));
+  </script>
+</body>
+</html>
